@@ -1,8 +1,8 @@
-package me.hsgamer.bettergui.exampleaddon;
+package me.hsgamer.bettergui.vaultbridge;
 
 import me.hsgamer.bettergui.object.addon.Addon;
 
-public final class ExampleAddon extends Addon {
+public final class VaultBridge extends Addon {
 
   @Override
   public void onEnable() {
