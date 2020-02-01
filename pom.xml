@@ -15,7 +15,7 @@
   <properties>
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.mainClass>me.hsgamer.bettergui.vaultbridge.VaultBridge</project.mainClass>
+    <project.mainClass>me.hsgamer.bettergui.vaultbridge.Main</project.mainClass>
   </properties>
 
   <build>
