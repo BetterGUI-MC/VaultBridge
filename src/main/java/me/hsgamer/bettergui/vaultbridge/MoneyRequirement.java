@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import me.hsgamer.bettergui.BetterGUI;
+import me.hsgamer.bettergui.config.impl.MessageConfig.DefaultMessage;
 import me.hsgamer.bettergui.manager.VariableManager;
 import me.hsgamer.bettergui.object.Icon;
 import me.hsgamer.bettergui.object.IconRequirement;
@@ -35,9 +36,8 @@ public class MoneyRequirement extends IconRequirement<Double> {
         try {
           list.add(Double.parseDouble(parsed));
         } catch (NumberFormatException e) {
-          String error =
-              ChatColor.RED + "Error parsing value!" + parsed + " is not a valid number";
-          player.sendMessage(error);
+          CommonUtils.sendMessage(player, BetterGUI.getInstance().getMessageConfig().get(
+              DefaultMessage.INVALID_NUMBER).replace("{input}", parsed));
         }
       }
     });
@@ -68,7 +68,8 @@ public class MoneyRequirement extends IconRequirement<Double> {
             String message = BetterGUI.getInstance().getMessageConfig()
                 .get(String.class, "no-money", "&cYou don't have enough money to do this");
             if (!message.isEmpty()) {
-              CommonUtils.sendMessage(player, message.replace("{money}", VaultBridge.formatMoney(value)));
+              CommonUtils
+                  .sendMessage(player, message.replace("{money}", VaultBridge.formatMoney(value)));
             }
           }
           return false;
