@@ -32,6 +32,10 @@ public class VaultBridge {
     return economy != null;
   }
 
+  public static String getEconomyName() {
+    return economy.getName();
+  }
+
   public static boolean hasValidEconomy() {
     return economy != null;
   }
@@ -106,6 +110,10 @@ public class VaultBridge {
     }
     permission = rsp.getProvider();
     return permission != null;
+  }
+
+  public static String getPermissionName() {
+    return permission.getName();
   }
 
   public static boolean hasValidPermission() {

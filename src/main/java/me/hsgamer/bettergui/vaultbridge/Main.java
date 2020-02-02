@@ -1,5 +1,6 @@
 package me.hsgamer.bettergui.vaultbridge;
 
+import java.util.logging.Level;
 import me.hsgamer.bettergui.builder.CommandBuilder;
 import me.hsgamer.bettergui.builder.RequirementBuilder;
 import me.hsgamer.bettergui.manager.VariableManager;
@@ -10,7 +11,8 @@ public final class Main extends Addon {
   @Override
   public void onEnable() {
     if (VaultBridge.setupEconomy()) {
-      getPlugin().getLogger().info("Added Economy support from Vault");
+      getPlugin().getLogger()
+          .log(Level.INFO, "Added Economy support from Vault ({0})", VaultBridge.getEconomyName());
       VariableManager.register("money",
           (executor, identifier) -> VaultBridge.formatMoney(VaultBridge.getMoney(executor)));
       CommandBuilder.register("give-money:", GiveMoneyCommand.class);
@@ -20,7 +22,8 @@ public final class Main extends Addon {
       RequirementBuilder.register("money", MoneyRequirement.class);
     }
     if (VaultBridge.setupPermission()) {
-      getPlugin().getLogger().info("Added Group support from Vault");
+      getPlugin().getLogger()
+          .log(Level.INFO, "Added Group support from Vault ({0})", VaultBridge.getPermissionName());
       VariableManager
           .register("group", (executor, identifier) -> VaultBridge.getPrimaryGroup(executor));
     }
