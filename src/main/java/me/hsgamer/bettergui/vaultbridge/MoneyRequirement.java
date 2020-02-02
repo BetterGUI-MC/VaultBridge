@@ -9,6 +9,7 @@ import me.hsgamer.bettergui.BetterGUI;
 import me.hsgamer.bettergui.manager.VariableManager;
 import me.hsgamer.bettergui.object.Icon;
 import me.hsgamer.bettergui.object.IconRequirement;
+import me.hsgamer.bettergui.util.CommonUtils;
 import me.hsgamer.bettergui.util.ExpressionUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -65,9 +66,9 @@ public class MoneyRequirement extends IconRequirement<Double> {
             }
           } else {
             String message = BetterGUI.getInstance().getMessageConfig()
-                .get(String.class, "no-money", "You don't have enough money to do this");
+                .get(String.class, "no-money", "&cYou don't have enough money to do this");
             if (!message.isEmpty()) {
-              player.sendMessage(message.replace("{money}", VaultBridge.formatMoney(value)));
+              CommonUtils.sendMessage(player, message.replace("{money}", VaultBridge.formatMoney(value)));
             }
           }
           return false;

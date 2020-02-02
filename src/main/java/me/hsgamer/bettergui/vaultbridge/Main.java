@@ -17,7 +17,7 @@ public final class Main extends Addon {
           (executor, identifier) -> VaultBridge.formatMoney(VaultBridge.getMoney(executor)));
       CommandBuilder.register("give-money:", GiveMoneyCommand.class);
       getPlugin().getMessageConfig().getConfig()
-          .addDefault("no-money", "You don't have enough money to do this");
+          .addDefault("no-money", "&cYou don't have enough money to do this");
       getPlugin().getMessageConfig().saveConfig();
       RequirementBuilder.register("money", MoneyRequirement.class);
     }
