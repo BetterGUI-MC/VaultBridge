@@ -9,8 +9,19 @@ import me.hsgamer.bettergui.object.addon.Addon;
 public final class Main extends Addon {
 
   @Override
+  public boolean onLoad() {
+    VaultBridge.setup();
+    if (VaultBridge.hasValidEconomy() || VaultBridge.hasValidPermission()) {
+      return true;
+    } else {
+      getPlugin().getLogger().info("Vault Not Found. Disabling");
+      return false;
+    }
+  }
+
+  @Override
   public void onEnable() {
-    if (VaultBridge.setupEconomy()) {
+    if (VaultBridge.hasValidEconomy()) {
       getPlugin().getLogger()
           .log(Level.INFO, "Added Economy support from Vault ({0})", VaultBridge.getEconomyName());
       VariableManager.register("money",
@@ -21,7 +32,7 @@ public final class Main extends Addon {
       getPlugin().getMessageConfig().saveConfig();
       RequirementBuilder.register("money", MoneyRequirement.class);
     }
-    if (VaultBridge.setupPermission()) {
+    if (VaultBridge.hasValidPermission()) {
       getPlugin().getLogger()
           .log(Level.INFO, "Added Group support from Vault ({0})", VaultBridge.getPermissionName());
       VariableManager

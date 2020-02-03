@@ -16,21 +16,27 @@ public class VaultBridge {
 
   }
 
+  public static void setup() {
+    if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+      return;
+    }
+
+    RegisteredServiceProvider<Economy> rspE = Bukkit.getServicesManager()
+        .getRegistration(Economy.class);
+    if (rspE != null) {
+      economy = rspE.getProvider();
+    }
+
+    RegisteredServiceProvider<Permission> rspP = Bukkit.getServicesManager()
+        .getRegistration(Permission.class);
+    if (rspP != null) {
+      permission = rspP.getProvider();
+    }
+  }
+
   /*
   ECONOMY
    */
-  public static boolean setupEconomy() {
-    if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
-      return false;
-    }
-    RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager()
-        .getRegistration(Economy.class);
-    if (rsp == null) {
-      return false;
-    }
-    economy = rsp.getProvider();
-    return economy != null;
-  }
 
   public static String getEconomyName() {
     return economy.getName();
@@ -99,19 +105,6 @@ public class VaultBridge {
   /*
   Permission
    */
-  public static boolean setupPermission() {
-    if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
-      return false;
-    }
-    RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager()
-        .getRegistration(Permission.class);
-    if (rsp == null) {
-      return false;
-    }
-    permission = rsp.getProvider();
-    return permission != null;
-  }
-
   public static String getPermissionName() {
     return permission.getName();
   }
