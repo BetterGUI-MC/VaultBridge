@@ -34,9 +34,4 @@ public final class Main extends Addon {
           .register("group", (executor, identifier) -> VaultBridge.getPrimaryGroup(executor));
     }
   }
-
-  @Override
-  public void onDisable() {
-    // Disable logic
-  }
 }
