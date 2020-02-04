@@ -10,8 +10,6 @@ import org.bukkit.entity.Player;
 
 public class GiveMoneyCommand extends Command {
 
-  private String errorMessage;
-
   public GiveMoneyCommand(String string) {
     super(string);
   }
@@ -25,17 +23,7 @@ public class GiveMoneyCommand extends Command {
     } else if (ExpressionUtils.isValidExpression(parsed)) {
       moneyToGive = Objects.requireNonNull(ExpressionUtils.getResult(parsed)).doubleValue();
     } else {
-      errorMessage = ChatColor.RED + "Invalid money amount: " + parsed;
-    }
-
-    if (errorMessage != null) {
-      player.sendMessage(errorMessage);
-      return;
-    }
-    if (!VaultBridge.hasValidEconomy()) {
-      player.sendMessage(ChatColor.RED
-          + "Vault with a compatible economy plugin not found. Please inform the staff.");
-      return;
+      player.sendMessage(ChatColor.RED + "Invalid money amount: " + parsed);
     }
 
     if (moneyToGive > 0) {
