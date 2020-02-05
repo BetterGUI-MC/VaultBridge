@@ -26,7 +26,7 @@ public class MoneyRequirement extends IconRequirement<Object, Double> implements
     if (value instanceof Double) {
       return (Double) value;
     } else {
-      String raw = ((String) value).trim();
+      String raw = String.valueOf(value).trim();
       String parsed = icon.hasVariables(raw) ? icon.setVariables(raw, player) : raw;
       if (ExpressionUtils.isValidExpression(parsed)) {
         return ExpressionUtils.getResult(parsed).doubleValue();
