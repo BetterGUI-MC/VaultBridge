@@ -23,6 +23,8 @@ public final class Main extends Addon {
       getPlugin().getLogger()
           .log(Level.INFO, "Added Economy support from Vault ({0})", VaultBridge.getEconomyName());
       VariableManager.register("money",
+          (executor, identifier) -> String.valueOf(VaultBridge.getMoney(executor)));
+      VariableManager.register("money_formatted",
           (executor, identifier) -> VaultBridge.formatMoney(VaultBridge.getMoney(executor)));
       CommandBuilder.register("give-money:", GiveMoneyCommand.class);
       RequirementBuilder.register("money", MoneyRequirement.class);
