@@ -23,21 +23,17 @@ public class MoneyRequirement extends IconRequirement<Object, Double> implements
 
   @Override
   public Double getParsedValue(Player player) {
-    if (value instanceof Double) {
-      return (Double) value;
+    String raw = String.valueOf(value).trim();
+    String parsed = icon.hasVariables(raw) ? icon.setVariables(raw, player) : raw;
+    if (ExpressionUtils.isValidExpression(parsed)) {
+      return ExpressionUtils.getResult(parsed).doubleValue();
     } else {
-      String raw = String.valueOf(value).trim();
-      String parsed = icon.hasVariables(raw) ? icon.setVariables(raw, player) : raw;
-      if (ExpressionUtils.isValidExpression(parsed)) {
-        return ExpressionUtils.getResult(parsed).doubleValue();
-      } else {
-        try {
-          return Double.parseDouble(parsed);
-        } catch (NumberFormatException e) {
-          CommonUtils.sendMessage(player, BetterGUI.getInstance().getMessageConfig().get(
-              DefaultMessage.INVALID_NUMBER).replace("{input}", parsed));
-          return 0D;
-        }
+      try {
+        return Double.parseDouble(parsed);
+      } catch (NumberFormatException e) {
+        CommonUtils.sendMessage(player, BetterGUI.getInstance().getMessageConfig().get(
+            DefaultMessage.INVALID_NUMBER).replace("{input}", parsed));
+        return 0D;
       }
     }
   }
