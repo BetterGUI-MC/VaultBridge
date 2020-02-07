@@ -9,14 +9,6 @@ import me.hsgamer.bettergui.object.addon.Addon;
 public final class Main extends Addon {
 
   @Override
-  public boolean onLoad() {
-    getPlugin().getMessageConfig().getConfig()
-        .addDefault("no-money", "&cYou don't have enough money to do this");
-    getPlugin().getMessageConfig().saveConfig();
-    return true;
-  }
-
-  @Override
   public void onEnable() {
     VaultBridge.setup();
     if (VaultBridge.hasValidEconomy()) {

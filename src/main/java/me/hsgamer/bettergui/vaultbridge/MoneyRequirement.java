@@ -42,19 +42,7 @@ public class MoneyRequirement extends IconRequirement<Object, Double> implements
   public boolean check(Player player) {
     double money = getParsedValue(player);
     if (money > 0 && !VaultBridge.hasMoney(player, money)) {
-      if (failMessage != null) {
-        if (!failMessage.isEmpty()) {
-          player.sendMessage(failMessage
-              .replace("{money}", VaultBridge.formatMoney(money)));
-        }
-      } else {
-        String message = BetterGUI.getInstance().getMessageConfig()
-            .get(String.class, "no-money", "&cYou don't have enough money to do this");
-        if (!message.isEmpty()) {
-          CommonUtils
-              .sendMessage(player, message.replace("{money}", VaultBridge.formatMoney(money)));
-        }
-      }
+      sendFailCommand(player);
       return false;
     }
     checked.put(player.getUniqueId(), money);
