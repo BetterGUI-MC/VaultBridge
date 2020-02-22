@@ -17,10 +17,6 @@ public class VaultBridge {
   }
 
   public static void setup() {
-    if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
-      return;
-    }
-
     RegisteredServiceProvider<Economy> rspE = Bukkit.getServicesManager()
         .getRegistration(Economy.class);
     if (rspE != null) {
