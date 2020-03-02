@@ -18,7 +18,7 @@ public class GiveMoneyCommand extends Command {
   public void addToTaskChain(Player player, TaskChain<?> taskChain) {
     double moneyToGive = 0;
     String parsed = getParsedCommand(player);
-    if (Validate.isValidPositiveInteger(parsed)) {
+    if (Validate.isValidPositiveNumber(parsed)) {
       moneyToGive = Double.parseDouble(parsed);
     } else if (ExpressionUtils.isValidExpression(parsed)) {
       moneyToGive = Objects.requireNonNull(ExpressionUtils.getResult(parsed)).doubleValue();

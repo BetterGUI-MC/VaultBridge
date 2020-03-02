@@ -1,7 +1,9 @@
 package me.hsgamer.bettergui.vaultbridge;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import me.hsgamer.bettergui.BetterGUI;
 import me.hsgamer.bettergui.config.impl.MessageConfig.DefaultMessage;
@@ -10,6 +12,7 @@ import me.hsgamer.bettergui.object.IconRequirement;
 import me.hsgamer.bettergui.object.IconVariable;
 import me.hsgamer.bettergui.util.CommonUtils;
 import me.hsgamer.bettergui.util.ExpressionUtils;
+import me.hsgamer.bettergui.util.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -28,9 +31,10 @@ public class MoneyRequirement extends IconRequirement<Object, Double> implements
     if (ExpressionUtils.isValidExpression(parsed)) {
       return ExpressionUtils.getResult(parsed).doubleValue();
     } else {
-      try {
-        return Double.parseDouble(parsed);
-      } catch (NumberFormatException e) {
+      Optional<BigDecimal> number = Validate.getNumber(parsed);
+      if (number.isPresent()) {
+        return number.get().doubleValue();
+      } else {
         CommonUtils.sendMessage(player, BetterGUI.getInstance().getMessageConfig().get(
             DefaultMessage.INVALID_NUMBER).replace("{input}", parsed));
         return 0D;
