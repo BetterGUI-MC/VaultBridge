@@ -46,7 +46,6 @@ public class MoneyRequirement extends IconRequirement<Object, Double> implements
   public boolean check(Player player) {
     double money = getParsedValue(player);
     if (money > 0 && !VaultBridge.hasMoney(player, money)) {
-      sendFailCommand(player);
       return false;
     }
     checked.put(player.getUniqueId(), money);
