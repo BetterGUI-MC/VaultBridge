@@ -8,26 +8,25 @@ import java.util.UUID;
 import me.hsgamer.bettergui.BetterGUI;
 import me.hsgamer.bettergui.config.impl.MessageConfig.DefaultMessage;
 import me.hsgamer.bettergui.object.Icon;
-import me.hsgamer.bettergui.object.IconRequirement;
 import me.hsgamer.bettergui.object.IconVariable;
+import me.hsgamer.bettergui.object.Requirement;
 import me.hsgamer.bettergui.util.CommonUtils;
 import me.hsgamer.bettergui.util.ExpressionUtils;
 import me.hsgamer.bettergui.util.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class MoneyRequirement extends IconRequirement<Object, Double> implements IconVariable {
+public class MoneyRequirement extends Requirement<Object, Double> implements IconVariable {
 
   private Map<UUID, Double> checked = new HashMap<>();
 
-  public MoneyRequirement(Icon icon) {
-    super(icon, true);
+  public MoneyRequirement() {
+    super(true);
   }
 
   @Override
   public Double getParsedValue(Player player) {
-    String raw = String.valueOf(value).trim();
-    String parsed = icon.hasVariables(raw) ? icon.setVariables(raw, player) : raw;
+    String parsed = parseFromString(String.valueOf(value).trim(), player);
     if (ExpressionUtils.isValidExpression(parsed)) {
       return ExpressionUtils.getResult(parsed).doubleValue();
     } else {
@@ -66,8 +65,8 @@ public class MoneyRequirement extends IconRequirement<Object, Double> implements
   }
 
   @Override
-  public Icon getIcon() {
-    return icon;
+  public Optional<Icon> getIconInvolved() {
+    return getIcon();
   }
 
   @Override
