@@ -4,7 +4,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class VaultBridge {
@@ -42,14 +42,14 @@ public class VaultBridge {
     return economy != null;
   }
 
-  public static double getMoney(Player player) {
+  public static double getMoney(OfflinePlayer player) {
     if (!hasValidEconomy()) {
       throw new IllegalStateException("Economy plugin was not found!");
     }
-    return economy.getBalance(player, player.getWorld().getName());
+    return economy.getBalance(player);
   }
 
-  public static boolean hasMoney(Player player, double minimum) {
+  public static boolean hasMoney(OfflinePlayer player, double minimum) {
     if (!hasValidEconomy()) {
       throw new IllegalStateException("Economy plugin was not found!");
     }
@@ -57,7 +57,7 @@ public class VaultBridge {
       throw new IllegalArgumentException("Invalid amount of money: " + minimum);
     }
 
-    double balance = economy.getBalance(player, player.getWorld().getName());
+    double balance = economy.getBalance(player);
 
     return balance >= minimum;
   }
@@ -65,7 +65,7 @@ public class VaultBridge {
   /**
    * @return true if the operation was successful.
    */
-  public static boolean takeMoney(Player player, double amount) {
+  public static boolean takeMoney(OfflinePlayer player, double amount) {
     if (!hasValidEconomy()) {
       throw new IllegalStateException("Economy plugin was not found!");
     }
@@ -73,11 +73,11 @@ public class VaultBridge {
       throw new IllegalArgumentException("Invalid amount of money: " + amount);
     }
 
-    EconomyResponse response = economy.withdrawPlayer(player, player.getWorld().getName(), amount);
+    EconomyResponse response = economy.withdrawPlayer(player, amount);
     return response.transactionSuccess();
   }
 
-  public static boolean giveMoney(Player player, double amount) {
+  public static boolean giveMoney(OfflinePlayer player, double amount) {
     if (!hasValidEconomy()) {
       throw new IllegalStateException("Economy plugin was not found!");
     }
@@ -85,7 +85,7 @@ public class VaultBridge {
       throw new IllegalArgumentException("Invalid amount of money: " + amount);
     }
 
-    EconomyResponse response = economy.depositPlayer(player, player.getWorld().getName(), amount);
+    EconomyResponse response = economy.depositPlayer(player, amount);
 
     return response.transactionSuccess();
   }
@@ -109,11 +109,11 @@ public class VaultBridge {
     return permission != null;
   }
 
-  public static String getPrimaryGroup(Player player) {
+  public static String getPrimaryGroup(OfflinePlayer player) {
     if (!hasValidPermission()) {
       throw new IllegalStateException("Permission plugin not found");
     } else {
-      return permission.getPrimaryGroup(player);
+      return permission.getPrimaryGroup(null, player);
     }
   }
 }

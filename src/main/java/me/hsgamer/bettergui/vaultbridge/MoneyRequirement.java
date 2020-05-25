@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import me.hsgamer.bettergui.BetterGUI;
-import me.hsgamer.bettergui.config.impl.MessageConfig.DefaultMessage;
+import me.hsgamer.bettergui.config.impl.MessageConfig;
 import me.hsgamer.bettergui.object.LocalVariable;
 import me.hsgamer.bettergui.object.LocalVariableManager;
 import me.hsgamer.bettergui.object.Requirement;
@@ -14,6 +13,7 @@ import me.hsgamer.bettergui.util.CommonUtils;
 import me.hsgamer.bettergui.util.ExpressionUtils;
 import me.hsgamer.bettergui.util.Validate;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class MoneyRequirement extends Requirement<Object, Double> implements LocalVariable {
@@ -34,8 +34,8 @@ public class MoneyRequirement extends Requirement<Object, Double> implements Loc
       if (number.isPresent()) {
         return number.get().doubleValue();
       } else {
-        CommonUtils.sendMessage(player, BetterGUI.getInstance().getMessageConfig().get(
-            DefaultMessage.INVALID_NUMBER).replace("{input}", parsed));
+        CommonUtils.sendMessage(player,
+            MessageConfig.INVALID_NUMBER.getValue().replace("{input}", parsed));
         return 0D;
       }
     }
@@ -70,12 +70,14 @@ public class MoneyRequirement extends Requirement<Object, Double> implements Loc
   }
 
   @Override
-  public String getReplacement(Player player, String s) {
-    double money = getParsedValue(player);
+  public String getReplacement(OfflinePlayer player, String s) {
+    if (!player.isOnline()) {
+      return "";
+    }
+    double money = getParsedValue(player.getPlayer());
     if (money > 0 && !VaultBridge.hasMoney(player, money)) {
       return String.valueOf(money);
     }
-    return BetterGUI.getInstance().getMessageConfig()
-        .get(DefaultMessage.HAVE_MET_REQUIREMENT_PLACEHOLDER);
+    return MessageConfig.HAVE_MET_REQUIREMENT_PLACEHOLDER.getValue();
   }
 }
