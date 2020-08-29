@@ -18,8 +18,8 @@ public final class Main extends Addon {
           (executor, identifier) -> String.valueOf(VaultBridge.getMoney(executor)));
       VariableManager.register("money_formatted",
           (executor, identifier) -> VaultBridge.formatMoney(VaultBridge.getMoney(executor)));
-      CommandBuilder.register("give-money:", GiveMoneyCommand.class);
-      RequirementBuilder.register("money", MoneyRequirement.class);
+      CommandBuilder.register(GiveMoneyCommand::new, "give-money:");
+      RequirementBuilder.register(MoneyRequirement::new, "money");
     }
     if (VaultBridge.hasValidPermission()) {
       getPlugin().getLogger()
