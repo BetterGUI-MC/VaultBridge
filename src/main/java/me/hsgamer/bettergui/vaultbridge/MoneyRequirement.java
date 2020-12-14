@@ -1,83 +1,68 @@
 package me.hsgamer.bettergui.vaultbridge;
 
+import me.hsgamer.bettergui.api.requirement.TakableRequirement;
+import me.hsgamer.bettergui.config.MessageConfig;
+import me.hsgamer.bettergui.lib.core.bukkit.utils.MessageUtils;
+import me.hsgamer.bettergui.lib.core.expression.ExpressionUtils;
+import me.hsgamer.bettergui.lib.core.variable.VariableManager;
+import me.hsgamer.bettergui.manager.PluginVariableManager;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import me.hsgamer.bettergui.config.MessageConfig;
-import me.hsgamer.bettergui.object.Requirement;
-import me.hsgamer.bettergui.object.variable.LocalVariable;
-import me.hsgamer.bettergui.object.variable.LocalVariableManager;
-import me.hsgamer.bettergui.util.MessageUtils;
-import me.hsgamer.bettergui.util.common.Validate;
-import me.hsgamer.bettergui.util.expression.ExpressionUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
-public class MoneyRequirement extends Requirement<Object, Double> implements LocalVariable {
+public class MoneyRequirement extends TakableRequirement<Double> {
 
-  private final Map<UUID, Double> checked = new HashMap<>();
+    private final Map<UUID, Double> checked = new HashMap<>();
 
-  public MoneyRequirement() {
-    super(true);
-  }
-
-  @Override
-  public Double getParsedValue(Player player) {
-    String parsed = parseFromString(String.valueOf(value).trim(), player);
-    if (ExpressionUtils.isValidExpression(parsed)) {
-      return ExpressionUtils.getResult(parsed).doubleValue();
-    } else {
-      Optional<BigDecimal> number = Validate.getNumber(parsed);
-      if (number.isPresent()) {
-        return number.get().doubleValue();
-      } else {
-        MessageUtils.sendMessage(player,
-            MessageConfig.INVALID_NUMBER.getValue().replace("{input}", parsed));
-        return 0D;
-      }
+    public MoneyRequirement(String name) {
+        super(name);
+        PluginVariableManager.register(name, (original, uuid) -> {
+            double money = getParsedValue(uuid);
+            if (money > 0 && !VaultBridge.hasMoney(uuid, money)) {
+                return String.valueOf(money);
+            }
+            return MessageConfig.HAVE_MET_REQUIREMENT_PLACEHOLDER.getValue();
+        });
     }
-  }
 
-  @Override
-  public boolean check(Player player) {
-    double money = getParsedValue(player);
-    if (money > 0 && !VaultBridge.hasMoney(player, money)) {
-      return false;
+    @Override
+    protected boolean getDefaultTake() {
+        return true;
     }
-    checked.put(player.getUniqueId(), money);
-    return true;
-  }
 
-  @Override
-  public void take(Player player) {
-    if (!VaultBridge.takeMoney(player, checked.remove(player.getUniqueId()))) {
-      player.sendMessage(ChatColor.RED
-          + "Error: the transaction couldn't be executed. Please inform the staff.");
+    @Override
+    protected Object getDefaultValue() {
+        return "0";
     }
-  }
 
-  @Override
-  public String getIdentifier() {
-    return "required_money";
-  }
-
-  @Override
-  public LocalVariableManager<?> getInvolved() {
-    return getVariableManager();
-  }
-
-  @Override
-  public String getReplacement(OfflinePlayer player, String s) {
-    if (!player.isOnline()) {
-      return "";
+    @Override
+    protected void takeChecked(UUID uuid) {
+        if (!VaultBridge.takeMoney(uuid, checked.remove(uuid))) {
+            Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff."));
+        }
     }
-    double money = getParsedValue(player.getPlayer());
-    if (money > 0 && !VaultBridge.hasMoney(player, money)) {
-      return String.valueOf(money);
+
+    @Override
+    public Double getParsedValue(UUID uuid) {
+        String parsed = VariableManager.setVariables(String.valueOf(value).trim(), uuid);
+        return Optional.ofNullable(ExpressionUtils.getResult(parsed)).map(BigDecimal::doubleValue).orElseGet(() -> {
+            Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> MessageUtils.sendMessage(player, MessageConfig.INVALID_NUMBER.getValue().replace("{input}", parsed)));
+            return 0D;
+        });
     }
-    return MessageConfig.HAVE_MET_REQUIREMENT_PLACEHOLDER.getValue();
-  }
+
+    @Override
+    public boolean check(UUID uuid) {
+        double money = getParsedValue(uuid);
+        if (money > 0 && !VaultBridge.hasMoney(uuid, money)) {
+            return false;
+        }
+        checked.put(uuid, money);
+        return true;
+    }
 }

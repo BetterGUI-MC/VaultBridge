@@ -1,31 +1,27 @@
 package me.hsgamer.bettergui.vaultbridge;
 
-import java.util.logging.Level;
-import me.hsgamer.bettergui.builder.CommandBuilder;
+import me.hsgamer.bettergui.api.addon.BetterGUIAddon;
+import me.hsgamer.bettergui.builder.ActionBuilder;
 import me.hsgamer.bettergui.builder.RequirementBuilder;
-import me.hsgamer.bettergui.manager.VariableManager;
-import me.hsgamer.bettergui.object.addon.Addon;
+import me.hsgamer.bettergui.lib.core.variable.VariableManager;
 
-public final class Main extends Addon {
+import java.util.logging.Level;
 
-  @Override
-  public void onEnable() {
-    VaultBridge.setup();
-    if (VaultBridge.hasValidEconomy()) {
-      getPlugin().getLogger()
-          .log(Level.INFO, "Added Economy support from Vault ({0})", VaultBridge.getEconomyName());
-      VariableManager.register("money",
-          (executor, identifier) -> String.valueOf(VaultBridge.getMoney(executor)));
-      VariableManager.register("money_formatted",
-          (executor, identifier) -> VaultBridge.formatMoney(VaultBridge.getMoney(executor)));
-      CommandBuilder.register(GiveMoneyCommand::new, "give-money:");
-      RequirementBuilder.register(MoneyRequirement::new, "money");
+public final class Main extends BetterGUIAddon {
+
+    @Override
+    public void onEnable() {
+        VaultBridge.setup();
+        if (VaultBridge.hasValidEconomy()) {
+            getPlugin().getLogger().log(Level.INFO, "Added Economy support from Vault ({0})", VaultBridge.getEconomyName());
+            VariableManager.register("money", (original, uuid) -> String.valueOf(VaultBridge.getMoney(uuid)));
+            VariableManager.register("money_formatted", (original, uuid) -> VaultBridge.formatMoney(VaultBridge.getMoney(uuid)));
+            ActionBuilder.INSTANCE.register(GiveMoneyAction::new, "give-money");
+            RequirementBuilder.INSTANCE.register(MoneyRequirement::new, "money");
+        }
+        if (VaultBridge.hasValidPermission()) {
+            getPlugin().getLogger().log(Level.INFO, "Added Group support from Vault ({0})", VaultBridge.getPermissionName());
+            VariableManager.register("group", (original, uuid) -> VaultBridge.getPrimaryGroup(uuid));
+        }
     }
-    if (VaultBridge.hasValidPermission()) {
-      getPlugin().getLogger()
-          .log(Level.INFO, "Added Group support from Vault ({0})", VaultBridge.getPermissionName());
-      VariableManager
-          .register("group", (executor, identifier) -> VaultBridge.getPrimaryGroup(executor));
-    }
-  }
 }

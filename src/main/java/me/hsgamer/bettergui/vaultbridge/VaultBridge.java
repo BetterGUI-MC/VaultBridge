@@ -4,116 +4,117 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
+
+import java.util.UUID;
 
 public class VaultBridge {
 
-  private static Economy economy;
-  private static Permission permission;
+    private static Economy economy;
+    private static Permission permission;
 
-  private VaultBridge() {
+    private VaultBridge() {
 
-  }
-
-  public static void setup() {
-    RegisteredServiceProvider<Economy> rspE = Bukkit.getServicesManager()
-        .getRegistration(Economy.class);
-    if (rspE != null) {
-      economy = rspE.getProvider();
     }
 
-    RegisteredServiceProvider<Permission> rspP = Bukkit.getServicesManager()
-        .getRegistration(Permission.class);
-    if (rspP != null) {
-      permission = rspP.getProvider();
+    public static void setup() {
+        RegisteredServiceProvider<Economy> rspE = Bukkit.getServicesManager()
+                .getRegistration(Economy.class);
+        if (rspE != null) {
+            economy = rspE.getProvider();
+        }
+
+        RegisteredServiceProvider<Permission> rspP = Bukkit.getServicesManager()
+                .getRegistration(Permission.class);
+        if (rspP != null) {
+            permission = rspP.getProvider();
+        }
     }
-  }
 
   /*
   ECONOMY
    */
 
-  public static String getEconomyName() {
-    return economy.getName();
-  }
-
-  public static boolean hasValidEconomy() {
-    return economy != null;
-  }
-
-  public static double getMoney(OfflinePlayer player) {
-    if (!hasValidEconomy()) {
-      throw new IllegalStateException("Economy plugin was not found!");
-    }
-    return economy.getBalance(player);
-  }
-
-  public static boolean hasMoney(OfflinePlayer player, double minimum) {
-    if (!hasValidEconomy()) {
-      throw new IllegalStateException("Economy plugin was not found!");
-    }
-    if (minimum < 0.0) {
-      throw new IllegalArgumentException("Invalid amount of money: " + minimum);
+    public static String getEconomyName() {
+        return economy.getName();
     }
 
-    double balance = economy.getBalance(player);
-
-    return balance >= minimum;
-  }
-
-  /**
-   * @return true if the operation was successful.
-   */
-  public static boolean takeMoney(OfflinePlayer player, double amount) {
-    if (!hasValidEconomy()) {
-      throw new IllegalStateException("Economy plugin was not found!");
-    }
-    if (amount < 0.0) {
-      throw new IllegalArgumentException("Invalid amount of money: " + amount);
+    public static boolean hasValidEconomy() {
+        return economy != null;
     }
 
-    EconomyResponse response = economy.withdrawPlayer(player, amount);
-    return response.transactionSuccess();
-  }
-
-  public static boolean giveMoney(OfflinePlayer player, double amount) {
-    if (!hasValidEconomy()) {
-      throw new IllegalStateException("Economy plugin was not found!");
-    }
-    if (amount < 0.0) {
-      throw new IllegalArgumentException("Invalid amount of money: " + amount);
+    public static double getMoney(UUID uuid) {
+        if (!hasValidEconomy()) {
+            throw new IllegalStateException("Economy plugin was not found!");
+        }
+        return economy.getBalance(Bukkit.getOfflinePlayer(uuid));
     }
 
-    EconomyResponse response = economy.depositPlayer(player, amount);
+    public static boolean hasMoney(UUID uuid, double minimum) {
+        if (!hasValidEconomy()) {
+            throw new IllegalStateException("Economy plugin was not found!");
+        }
+        if (minimum < 0.0) {
+            throw new IllegalArgumentException("Invalid amount of money: " + minimum);
+        }
 
-    return response.transactionSuccess();
-  }
+        double balance = economy.getBalance(Bukkit.getOfflinePlayer(uuid));
 
-  public static String formatMoney(double amount) {
-    if (hasValidEconomy()) {
-      return economy.format(amount);
-    } else {
-      return Double.toString(amount);
+        return balance >= minimum;
     }
-  }
 
-  /*
-  Permission
-   */
-  public static String getPermissionName() {
-    return permission.getName();
-  }
+    /**
+     * @return true if the operation was successful.
+     */
+    public static boolean takeMoney(UUID uuid, double amount) {
+        if (!hasValidEconomy()) {
+            throw new IllegalStateException("Economy plugin was not found!");
+        }
+        if (amount < 0.0) {
+            throw new IllegalArgumentException("Invalid amount of money: " + amount);
+        }
 
-  public static boolean hasValidPermission() {
-    return permission != null;
-  }
-
-  public static String getPrimaryGroup(OfflinePlayer player) {
-    if (!hasValidPermission()) {
-      throw new IllegalStateException("Permission plugin not found");
-    } else {
-      return permission.getPrimaryGroup(null, player);
+        EconomyResponse response = economy.withdrawPlayer(Bukkit.getOfflinePlayer(uuid), amount);
+        return response.transactionSuccess();
     }
-  }
+
+    public static boolean giveMoney(UUID uuid, double amount) {
+        if (!hasValidEconomy()) {
+            throw new IllegalStateException("Economy plugin was not found!");
+        }
+        if (amount < 0.0) {
+            throw new IllegalArgumentException("Invalid amount of money: " + amount);
+        }
+
+        EconomyResponse response = economy.depositPlayer(Bukkit.getOfflinePlayer(uuid), amount);
+
+        return response.transactionSuccess();
+    }
+
+    public static String formatMoney(double amount) {
+        if (hasValidEconomy()) {
+            return economy.format(amount);
+        } else {
+            return Double.toString(amount);
+        }
+    }
+
+    /*
+    Permission
+     */
+    public static String getPermissionName() {
+        return permission.getName();
+    }
+
+    public static boolean hasValidPermission() {
+        return permission != null;
+    }
+
+    public static String getPrimaryGroup(UUID uuid) {
+        if (!hasValidPermission()) {
+            throw new IllegalStateException("Permission plugin not found");
+        } else {
+            return permission.getPrimaryGroup(null, Bukkit.getOfflinePlayer(uuid));
+        }
+    }
 }

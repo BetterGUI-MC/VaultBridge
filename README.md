@@ -1,12 +1,14 @@
 # VaultBridge
+
 Vault support for BetterGUI
 
 ## Included
-- Requirement types:
-  - `money`
-- Commands:
-  - `give-money:`
-- Variables:
-  - `{money}`
-  - `{money_formatted}`
-  - `{group}`
+
+- Requirement type:
+    - `money`
+- Action:
+    - `give-money:`
+- Variable:
+    - `{money}`
+    - `{money_formatted}`
+    - `{group}`
