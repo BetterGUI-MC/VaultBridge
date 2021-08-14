@@ -22,6 +22,7 @@ public final class Main extends BetterGUIAddon {
         if (VaultBridge.hasValidPermission()) {
             getPlugin().getLogger().log(Level.INFO, "Added Group support from Vault ({0})", VaultBridge.getPermissionName());
             VariableManager.register("group", (original, uuid) -> VaultBridge.getPrimaryGroup(uuid));
+            RequirementBuilder.INSTANCE.register(GroupRequirement::new, "group");
         }
     }
 }

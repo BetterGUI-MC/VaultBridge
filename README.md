@@ -6,6 +6,7 @@ Vault support for BetterGUI
 
 - Requirement type:
     - `money`
+    - `group`
 - Action:
     - `give-money:`
 - Variable:

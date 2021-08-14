@@ -111,8 +111,8 @@ public class VaultBridge {
     }
 
     public static String getPrimaryGroup(UUID uuid) {
-        if (!hasValidPermission()) {
-            throw new IllegalStateException("Permission plugin not found");
+        if (!hasValidPermission() || !permission.hasGroupSupport()) {
+            throw new IllegalStateException("Group permission plugin not found");
         } else {
             return permission.getPrimaryGroup(null, Bukkit.getOfflinePlayer(uuid));
         }
