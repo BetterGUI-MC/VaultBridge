@@ -6,6 +6,8 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class VaultBridge {
@@ -108,6 +110,14 @@ public class VaultBridge {
 
     public static boolean hasValidPermission() {
         return permission != null;
+    }
+
+    public static List<String> getGroups(UUID uuid) {
+        if (!hasValidPermission() || !permission.hasGroupSupport()) {
+            throw new IllegalStateException("Group permission plugin not found");
+        } else {
+            return Arrays.asList(permission.getPlayerGroups(null, Bukkit.getOfflinePlayer(uuid)));
+        }
     }
 
     public static String getPrimaryGroup(UUID uuid) {

@@ -17,7 +17,7 @@ public class GroupRequirement extends BaseRequirement<String> {
 
     @Override
     public boolean check(UUID uuid) {
-        return VaultBridge.getPrimaryGroup(uuid).equals(getParsedValue(uuid));
+        return VaultBridge.getGroups(uuid).contains(getParsedValue(uuid));
     }
 
     @Override
