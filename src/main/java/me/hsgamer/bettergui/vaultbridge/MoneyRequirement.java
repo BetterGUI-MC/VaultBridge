@@ -1,32 +1,27 @@
 package me.hsgamer.bettergui.vaultbridge;
 
+import me.hsgamer.bettergui.BetterGUI;
 import me.hsgamer.bettergui.api.requirement.TakableRequirement;
-import me.hsgamer.bettergui.config.MessageConfig;
-import me.hsgamer.bettergui.lib.core.bukkit.utils.MessageUtils;
-import me.hsgamer.bettergui.lib.core.expression.ExpressionUtils;
-import me.hsgamer.bettergui.lib.core.variable.VariableManager;
-import me.hsgamer.bettergui.manager.PluginVariableManager;
+import me.hsgamer.bettergui.builder.RequirementBuilder;
+import me.hsgamer.bettergui.util.StringReplacerApplier;
+import me.hsgamer.hscore.bukkit.utils.MessageUtils;
+import me.hsgamer.hscore.common.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 public class MoneyRequirement extends TakableRequirement<Double> {
-
-    private final Map<UUID, Double> checked = new HashMap<>();
-
-    public MoneyRequirement(String name) {
-        super(name);
-        PluginVariableManager.register(name, (original, uuid) -> {
-            double money = getParsedValue(uuid);
+    protected MoneyRequirement(RequirementBuilder.Input input) {
+        super(input);
+        getMenu().getVariableManager().register(getName(), (original, uuid) -> {
+            double money = getFinalValue(uuid);
             if (money > 0 && !VaultBridge.hasMoney(uuid, money)) {
                 return String.valueOf(money);
             }
-            return MessageConfig.HAVE_MET_REQUIREMENT_PLACEHOLDER.getValue();
+            return BetterGUI.getInstance().getMessageConfig().haveMetRequirementPlaceholder;
         });
     }
 
@@ -41,28 +36,23 @@ public class MoneyRequirement extends TakableRequirement<Double> {
     }
 
     @Override
-    protected void takeChecked(UUID uuid) {
-        if (!VaultBridge.takeMoney(uuid, checked.remove(uuid))) {
-            Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff."));
-        }
-    }
-
-    @Override
-    public Double getParsedValue(UUID uuid) {
-        String parsed = VariableManager.setVariables(String.valueOf(value).trim(), uuid);
-        return Optional.ofNullable(ExpressionUtils.getResult(parsed)).map(BigDecimal::doubleValue).orElseGet(() -> {
-            Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> MessageUtils.sendMessage(player, MessageConfig.INVALID_NUMBER.getValue().replace("{input}", parsed)));
+    protected Double convert(Object o, UUID uuid) {
+        String parsed = StringReplacerApplier.replace(String.valueOf(o).trim(), uuid, this);
+        return Validate.getNumber(parsed).map(BigDecimal::doubleValue).orElseGet(() -> {
+            Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> MessageUtils.sendMessage(player, BetterGUI.getInstance().getMessageConfig().invalidNumber.replace("{input}", parsed)));
             return 0D;
         });
     }
 
     @Override
-    public boolean check(UUID uuid) {
-        double money = getParsedValue(uuid);
-        if (money > 0 && !VaultBridge.hasMoney(uuid, money)) {
-            return false;
+    protected Result checkConverted(UUID uuid, Double value) {
+        if (value > 0 && !VaultBridge.hasMoney(uuid, value)) {
+            return Result.fail();
         }
-        checked.put(uuid, money);
-        return true;
+        return successConditional(uuid1 -> {
+            if (!VaultBridge.takeMoney(uuid1, value)) {
+                Optional.ofNullable(Bukkit.getPlayer(uuid1)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff."));
+            }
+        });
     }
 }

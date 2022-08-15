@@ -1,41 +1,41 @@
 package me.hsgamer.bettergui.vaultbridge;
 
+import me.hsgamer.bettergui.BetterGUI;
 import me.hsgamer.bettergui.api.action.BaseAction;
-import me.hsgamer.bettergui.lib.core.common.Validate;
-import me.hsgamer.bettergui.lib.core.expression.ExpressionUtils;
-import me.hsgamer.bettergui.lib.taskchain.TaskChain;
+import me.hsgamer.bettergui.builder.ActionBuilder;
+import me.hsgamer.hscore.common.Validate;
+import me.hsgamer.hscore.task.BatchRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
-import java.util.Objects;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
 public class GiveMoneyAction extends BaseAction {
-
-    public GiveMoneyAction(String string) {
-        super(string);
+    protected GiveMoneyAction(ActionBuilder.Input input) {
+        super(input);
     }
 
     @Override
-    public void addToTaskChain(UUID uuid, TaskChain<?> taskChain) {
-        double moneyToGive = 0;
+    public void accept(UUID uuid, BatchRunnable.Process process) {
         String parsed = getReplacedString(uuid);
-        if (Validate.isValidPositiveNumber(parsed)) {
-            moneyToGive = Double.parseDouble(parsed);
-        } else if (ExpressionUtils.isValidExpression(parsed)) {
-            moneyToGive = Objects.requireNonNull(ExpressionUtils.getResult(parsed)).doubleValue();
-        } else {
+        Optional<Double> optionalMoney = Validate.getNumber(parsed).map(BigDecimal::doubleValue);
+        if (!optionalMoney.isPresent()) {
             Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Invalid money amount: " + parsed));
+            process.next();
+            return;
         }
-
+        double moneyToGive = optionalMoney.get();
         if (moneyToGive > 0) {
-            double finalMoneyToGive = moneyToGive;
-            taskChain.sync(() -> {
-                if (!VaultBridge.giveMoney(uuid, finalMoneyToGive)) {
+            Bukkit.getScheduler().runTask(BetterGUI.getInstance(), () -> {
+                if (!VaultBridge.giveMoney(uuid, moneyToGive)) {
                     Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff."));
                 }
+                process.next();
             });
+        } else {
+            process.next();
         }
     }
 }
