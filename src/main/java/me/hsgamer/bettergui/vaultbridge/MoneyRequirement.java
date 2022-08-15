@@ -49,10 +49,11 @@ public class MoneyRequirement extends TakableRequirement<Double> {
         if (value > 0 && !VaultBridge.hasMoney(uuid, value)) {
             return Result.fail();
         }
-        return successConditional(uuid1 -> {
+        return successConditional((uuid1, process) -> Bukkit.getScheduler().runTask(BetterGUI.getInstance(), () -> {
             if (!VaultBridge.takeMoney(uuid1, value)) {
                 Optional.ofNullable(Bukkit.getPlayer(uuid1)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff."));
             }
-        });
+            process.next();
+        }));
     }
 }
