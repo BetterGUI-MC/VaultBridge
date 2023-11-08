@@ -1,6 +1,5 @@
 package me.hsgamer.bettergui.vaultbridge;
 
-import me.hsgamer.bettergui.BetterGUI;
 import me.hsgamer.bettergui.api.action.BaseAction;
 import me.hsgamer.bettergui.builder.ActionBuilder;
 import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
@@ -29,12 +28,12 @@ public class GiveMoneyAction extends BaseAction {
         }
         double moneyToGive = optionalMoney.get();
         if (moneyToGive > 0) {
-            Scheduler.CURRENT.runTask(BetterGUI.getInstance(), () -> {
+            Scheduler.current().sync().runTask(() -> {
                 if (!VaultBridge.giveMoney(uuid, moneyToGive)) {
                     Optional.ofNullable(Bukkit.getPlayer(uuid)).ifPresent(player -> player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff."));
                 }
                 process.next();
-            }, false);
+            });
         } else {
             process.next();
         }
